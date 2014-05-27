@@ -8,6 +8,10 @@ import (
 	"strings"
 )
 
+// ParseUrlValues parses url.Values into the s interface using
+// the reflect package. It also checks for the form struct tags
+// so they can be used as fieldnames instead of the variable
+// names. It returns the error if parsing failed.
 func ParseUrlValues(query url.Values, s interface{}) error {
 	tempintslice := []int{0}
 	ielements := reflect.TypeOf(s).Elem().NumField()
@@ -42,6 +46,8 @@ func ParseUrlValues(query url.Values, s interface{}) error {
 	return nil
 }
 
+// ParseRequest parses a net/http Request into url.Values
+// so it can use ParseUrlValues to parse the request
 func ParseRequest(req *http.Request, s interface{}) error {
 	req.ParseForm()
 	req.ParseMultipartForm(10000)
