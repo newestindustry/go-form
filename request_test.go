@@ -16,23 +16,23 @@ type Str struct {
 	H bool    `form:"varh"`
 }
 
-var unmarshalTests = []struct {
+var parseTests = []struct {
 	in  string
 	out Str
 }{
 	{"http://localhost/test/?a=asdf&b=42&c=42.42&d=true&e=ffff&vare=asdf&varf=42&varg=42.42&varh=true", Str{"asdf", 42, 42.42, true, "asdf", 42, 42.42, true}},
 }
 
-func TestUnmarshal(t *testing.T) {
-	for i, tt := range unmarshalTests {
+func TestParseUrlValues(t *testing.T) {
+	for i, tt := range parseTests {
 		uri, _ := url.Parse(tt.in)
 		query, _ := url.ParseQuery(uri.RawQuery)
 
 		s := Str{}
-		Unmarshal(query, &s)
+		ParseUrlValues(query, &s)
 
 		if s != tt.out {
-			t.Errorf("%d. Unmarshal(%s) => %+v returned, expected %+v", i, uri.RawQuery, s, tt.out)
+			t.Errorf("%d. ParseUrlValues(%s) => %+v returned, expected %+v", i, uri.RawQuery, s, tt.out)
 		}
 	}
 }

@@ -1,14 +1,14 @@
 package form
 
 import (
+	"net/http"
 	"net/url"
 	"reflect"
 	"strconv"
 	"strings"
 )
 
-func Unmarshal(query url.Values, s interface{}) error {
-
+func ParseUrlValues(query url.Values, s interface{}) error {
 	tempintslice := []int{0}
 	ielements := reflect.TypeOf(s).Elem().NumField()
 	for i := 0; i < ielements; i++ {
@@ -24,7 +24,6 @@ func Unmarshal(query url.Values, s interface{}) error {
 		if val, ok := query[fieldname]; ok {
 			curVal := val[0]
 			switch v.Kind() {
-
 			case reflect.Bool:
 				testBool, _ := strconv.ParseBool(curVal)
 				v.SetBool(testBool)
@@ -34,10 +33,20 @@ func Unmarshal(query url.Values, s interface{}) error {
 			case reflect.Int64:
 				testInt, _ := strconv.ParseInt(curVal, 0, 64)
 				v.SetInt(testInt)
-			default:
+			case reflect.String:
 				v.SetString(curVal)
+			default:
 			}
 		}
 	}
+	return nil
+}
+
+func ParseRequest(req *http.Request, s interface{}) error {
+	req.ParseForm()
+	req.ParseMultipartForm(10000)
+
+	ParseUrlValues(req.Form, s)
+
 	return nil
 }
